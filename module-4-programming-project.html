@@ -1,0 +1,494 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>CMPS 260: Module 4 Programming Project</title>
+<style>* { font-family: monospace; }</style>
+<script>
+
+// NOTE: You must implement the data structures using the prototype approach.
+//       This is not what the book uses, so you have to convert it.
+//       See also: https://it.pointpark.edu/tutorials/no-prototype-vs-prototype/
+
+// NOTE: Please review the following links regularly:
+//       https://it.pointpark.edu/tutorials/arrays-vs-objects/
+//       https://it.pointpark.edu/tutorials/no-prototype-vs-prototype/
+//       https://it.pointpark.edu/tutorials/implementation-vs-interface/
+
+
+
+//---------//
+// Project //
+//---------//
+console.log("Project");
+
+// I think i need these functions.
+function ValuePair(key, value) {
+  this.key = key;
+  this.value = value;
+  this.toString = function() {
+    return "[" + this.key + " - " + this.value + "]";
+  };
+ 
+};
+
+function Node(element) {
+  this.element = element;
+  this.next = null;
+}
+
+function LinkedList() {
+  this.length = 0;
+  this.head = null;
+}
+
+LinkedList.prototype.append = function(element) {
+  var node = new Node(element);
+  if (this.head === null) {
+    this.head = node;
+  }
+  else {
+    var tmp = this.head;
+    while (tmp.next !== null) {
+      tmp = tmp.next;
+    }
+    tmp.next = node;
+  }
+  this.length++;
+};
+
+LinkedList.prototype.insert = function(position, element) {
+  var node = new Node(element);
+  if (position === 0) {
+    var oldHead = this.head;
+    this.head = node;
+    this.head.next = oldHead;
+  }
+  else {
+    var tmp = this.head;
+    for (var i = 0; i < position-1; i++) {
+      tmp = tmp.next;
+    }
+    node.next = tmp.next;
+    tmp.next = node;
+  }
+  this.length++;
+};
+
+LinkedList.prototype.removeAt = function(position) {
+  var element = null;
+  if (position === 0) {
+    element = this.head.element;
+    this.head = this.head.next;
+  }
+  else {
+    var tmp = this.head;
+    for (var i = 0; i < position-1; i++) {
+      tmp = tmp.next;
+    }
+    element = tmp.next.element;
+    var prev = tmp;
+    var middle = tmp.next;
+    var next = middle.next;
+    prev.next = next;
+  }
+  this.length--;
+  return element;
+};
+
+LinkedList.prototype.remove = function(element) {
+  var position = this.indexOf(element);
+  return this.removeAt(position);
+};
+
+LinkedList.prototype.indexOf = function(element) {
+  var tmp = this.head;
+  for (var i = 0; i < this.length; i++) {
+    if (tmp.element === element) {
+      return i;
+    }
+    tmp = tmp.next;
+  }
+  return -1;
+};
+
+LinkedList.prototype.isEmpty = function() {
+  return this.length === 0;
+};
+
+LinkedList.prototype.size = function() {
+  var length = 0;
+  var tmp = this.head;
+  while (tmp !== null) {
+    length++;
+    tmp = tmp.next;
+  }
+  return length;
+};
+
+LinkedList.prototype.getHead = function() {
+  return this.head;
+}
+
+LinkedList.prototype.toString = function() {
+  var current = this.head;
+  var string = "List: ";
+  while (current) {
+    string += current.element + (current.next ? " -> " : "");
+    current = current.next;
+  }
+  return string;
+};
+
+LinkedList.prototype.print = function() {
+  console.log(this.toString());
+};
+// 1. Implement the set data structure using the prototype.
+
+function Set() {
+  this.items = {}; 
+
+  Set.prototype.add = function(value) {
+    if (!this.has(value)) {
+      this.items[value] = value;
+      return true;
+    }
+    return false;
+  };
+
+  Set.prototype.delete = function(value) {
+    if (this.has(value)) {
+      delete this.items[value];
+      return true;
+    }
+    return false;
+  };
+
+   Set.prototype.has = function(value) {
+    return value in this.items;
+  };
+
+   Set.prototype.clear = function() {
+    this.items = {};
+  };
+
+   Set.prototype.size = function() {
+    return this.values().length;
+  };
+
+   Set.prototype.values = function() {
+    return Object.values(this.items);
+  };
+
+   Set.prototype.union = function(otherSet) {
+    this.unionSet = new Set();
+    this.values().forEach(value => this.unionSet.add(value));
+    otherSet.values().forEach(value => this.unionSet.add(value));
+    return this.unionSet;
+  };
+  
+   Set.prototype.intersection = function(otherSet) {
+    var interssectionSet = new Set();
+
+    var values = this.values();
+    for (var i = 0; i < values.length; i++) {
+      if (otherSet.has(values[i])) {
+        interssectionSet.add(values[i]);  
+  }
+}
+return interssectionSet;
+};
+
+ Set.prototype.difference = function(otherSet) {
+  var differenceSet = new Set();
+  this.values().every(value => {
+    if (!otherSet.has(value)) {
+      differenceSet.add(value);
+    }
+  });
+  return differenceSet;
+};
+
+ Set.prototype.isSubsetOf = function(otherSet) {
+  if (this.size() > otherSet.size()) {
+    return false;
+  }
+  var isSubset = true;
+  this.values().every(value => {
+    if (!otherSet.has(value)) {
+      isSubset = false;
+      return false;
+    }
+    return true;
+  });
+  return isSubset;
+};
+}
+
+// A professor keeps attendence of classes with the following results:
+// All students: Mary, Joe, Tim, Rosalee, Vincent, Caroline
+// Class 1: Rosalee, Joe, Mary, Tim
+// Class 2: Mary, Tim, Vincent, Rosalee, Caroline
+// Class 3: Caroline, Tim, Vincent, Rosalee, Joe
+
+var allStudents = new Set();
+allStudents.add("Mary");
+allStudents.add("Joe");
+allStudents.add("Tim");
+allStudents.add("Rosalee");
+allStudents.add("Vincent");
+allStudents.add("Caroline");
+
+var Class1 = new Set();
+Class1.add("Rosalee");
+Class1.add("Joe");
+Class1.add("Mary");
+Class1.add("Tim");
+
+  
+var Class2 = new Set();
+Class2.add("Mary");
+Class2.add("Tim");
+Class2.add("Vincent");
+Class2.add("Rosalee");
+Class2.add("Caroline");
+
+var Class3 = new Set();
+Class3.add("Caroline");
+Class3.add("Tim");
+Class3.add("Vincent");
+Class3.add("Rosalee");
+Class3.add("Joe");
+
+
+// 2. Create a set of students for each class.
+console.log(Class1.values());
+console.log(Class2.values());
+console.log(Class3.values());
+
+// 3. Use set operations to get a list of students that attended at least
+//    one class.
+set1 = allStudents.union(Class1);
+set2 = set1.union(Class2);
+set3 = set2.union(Class3);
+console.log(set3.values());
+
+// 4. Use set operations to get a list of students that attended all classes.
+set4 = Class1.intersection(Class2);
+set5 = set4.intersection(Class3);
+console.log(set5.values());
+
+// 5. Show that the results for (2) and (3) are a subset of all students.
+set6 = set3.isSubsetOf(allStudents);
+console.log(set6);
+
+// 6. Implement the dictionary data structure using the prototype.
+
+function Dictionary() {
+  this.items = {};
+
+  Dictionary.prototype.toStrFn = function(key) {
+    if (key === null) {
+      return "NULL";
+    } else if (key === undefined) {
+      return "UNDEFINED";
+    } else if (typeof key === "string" || key instanceof String) {
+      return key;
+    }
+    return key.toString();
+  };
+
+  Dictionary.prototype.set = function(key, value) {
+    if (key != null && value != null) {
+      var tableKey = this.toStrFn(key);
+      this.items[tableKey] = new ValuePair(key, value);
+      return true;
+    }
+    return false;
+  };
+
+  Dictionary.prototype.delete = function(key) {
+    if (this.has(key)) {
+      delete this.items[this.toStrFn(key)];
+      return true;
+    }
+    return false;
+  };
+
+  Dictionary.prototype.has = function(key) {
+    return this.items[this.toStrFn(key)] != null;
+  };
+
+  Dictionary.prototype.get = function(key) {
+    
+    var valuePair = this.items[this.toStrFn(key)];
+    return valuePair == null ? undefined : valuePair.value;
+ 
+  };
+
+  Dictionary.prototype.clear = function() {
+    this.items = {};
+  };
+
+  Dictionary.prototype.size = function() {
+    return Object.keys(this.items).length;
+  };
+
+  Dictionary.prototype.keys = function() {
+    return Object.keys(this.items).map(key => this.items[key].key);
+  };
+
+  Dictionary.prototype.values = function() {
+    return Object.values(this.items).map(valuePair => valuePair.value);
+  };
+
+  Dictionary.prototype.getItems = function() {
+    return this.items;
+  };
+  
+  Dictionary.prototype.print = function() {
+    var valuePairs = Object.values(this.items);
+    var result = "";
+    for (var i = 0; i < valuePairs.length; i++) {
+      result += valuePairs[i].toString() + " ";
+    }
+    console.log(result.trim());
+  };
+}
+
+function ValuePair(key, value) {
+  this.key = key;
+  this.value = value;
+  this.toString = function() {
+    return "[" + this.key + " - " + this.value + "]";
+  };
+ 
+};
+// 7. Complete the method below that adds all key-value pairs from one
+//    dictionary into another. See also the example below.
+
+Dictionary.prototype.merge = function(dict) {
+  var dictItems = dict.getItems();
+  for (var key in dictItems) {
+    if (dictItems.hasOwnProperty(key)) {
+      var valuePair = dictItems[key];
+      this.set(valuePair.key, valuePair.value);
+    }
+  }
+};
+
+// Test your code by uncommenting these lines:
+var dict1 = new Dictionary();
+dict1.set("key1", "val1");
+dict1.set("key2", "val2");
+dict1.set("key3", "val3");
+var dict2 = new Dictionary();
+dict2.set("key3", "val3b");
+dict2.set("key4", "val4");
+dict1.merge(dict2);
+dict1.print(); // should contain key1-val1, key2-val2, key3-val3b, key4-val4
+
+// 8. Implement the hashtable data structure using the prototype.
+
+function HashTable() {
+  // store all elements in the table array
+  this.table = [];
+
+  // define hash function
+   HashTable.prototype.loseloseHashCode = function loseloseHashCode(key) {
+    var hash = 0;
+    for (var i = 0; i < key.length; i++) {
+      hash += key.charCodeAt(i);
+    }
+    return hash % 37;
+  };
+
+ HashTable.prototype.hashCode = function hashCode(key) {
+    return this.loseloseHashCode(key);
+  };
+  
+
+  HashTable.prototype.put = function(key, value) {
+    if (key != null && value != null) {
+      var position = this.hashCode(key);
+      if (this.table[position] == null) {
+        this.table[position] = new LinkedList();
+      }
+      this.table[position].append(new ValuePair(key, value));
+      return true;
+    }
+    return false;
+  };
+
+  HashTable.prototype.remove = function(key) {
+    var position = this.hasCode(key);
+    var linkenList = this.table[position];
+    if (linkedList != null && !linkedList.isEmpty()) {
+      var current = linkedList.getHead();
+      while (current != null) {
+        if (current.element.key === key) {
+          linkedList.remove(current.element);
+          if (linkedList.isEmpty()) {
+            delete this.table[position];
+        }
+        return true;
+      }
+       current = current.next;
+      }
+    }
+    return false;
+  };
+
+  HashTable.prototype.get = function(key) {
+    var position = this.hashCode(key);
+    var linkedList = this.table[position];
+    if (linkedList != null && !linkedList.isEmpty()) {
+      var current = linkedList.getHead();
+      while (current) {
+        if (current.element.key === key) {
+          return current.element.value;
+        }
+        current = current.next;
+      }
+    }
+    return undefined;
+  };
+
+  HashTable.prototype.print = function() {
+    // print the content of the hash table
+    for (var i = 0; i < this.table.length; i++) {
+      if (this.table[i] !== undefined) {
+        console.log(i + ": " + table[i]);
+      }
+    }
+  };
+}
+
+var hash = new HashTable();
+hash.put("Gandalf", "gandalf@gmail.com");
+hash.put("John", "johnsnow@gmail.com");
+hash.put("Tyrion", "tyrion@gmail.com");
+hash.put("Jeffrey", "jeff@gmail.com");
+hash.put("Albert", "batbutler@gmail.com");
+
+
+console.log(hash.get("Gandalf")); // should print value of Gandalf
+console.log(hash.get("John")); // should print value of John
+console.log(hash.get("Tyrion")); // should print value of Tyrion
+console.log(hash.get("Jeffrey")); // should print value of Jeffrey
+console.log(hash.get("Albert")); // should print value of Albert
+
+console.log(hash.hashCode("Gandalf")); // should print hash code of Gandalf
+console.log(hash.hashCode("John")); // should print hash code of John
+console.log(hash.hashCode("Tyrion")); // should print hash code of Tyrion
+console.log(hash.hashCode("Jeffrey")); // should print hash code of Jeffrey
+console.log(hash.hashCode("Albert")); // should print hash code of Albert
+
+
+
+</script>
+</head>
+<body>
+  See console!
+</body>
+</html>
