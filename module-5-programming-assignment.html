@@ -1,0 +1,603 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>CMPS 260: Module 5 Programming Assignment</title>
+<style>* { font-family: monospace; }</style>
+<script>
+
+// NOTE: You must implement the data structures using the no prototype approach.
+//       This is what the book uses, so you can copy it.
+//       See also: https://it.pointpark.edu/tutorials/no-prototype-vs-prototype/
+
+// NOTE: Please review the following links regularly:
+//       https://it.pointpark.edu/tutorials/arrays-vs-objects/
+//       https://it.pointpark.edu/tutorials/no-prototype-vs-prototype/
+//       https://it.pointpark.edu/tutorials/implementation-vs-interface/
+
+
+
+//------------------------------------//
+// The binary and binary search trees //
+//------------------------------------//
+console.log("The binary and binary search trees");
+
+function BinarySearchTree() {
+  function Node(key) {
+    this.key = key;
+    this.left = null;
+    this.right = null
+  }
+
+
+  // the root node
+  var root = null;
+
+  // helper functions
+  function insertNode(node, newNode) {
+    if (newNode.key < node.key) {
+      // go to left
+      if (node.left === null) {
+        // no left node yet so assign
+        node.left = newNode;
+      }
+      else {
+        // move down tree and repeat
+        insertNode(node.left, newNode);
+      }
+    }
+    else {
+      // go to right
+      if (node.right === null) {
+        // no right node yet so assign
+        node.right = newNode;
+      }
+      else {
+        // move down tree and repeat
+        insertNode(node.right, newNode);
+      }
+    }
+  }
+
+  this.insert = function(key) {
+    // insert new key in the tree
+    var newNode = new Node(key);
+    if (root === null) {
+      // no nodes yet
+      root = newNode;
+    }
+    else {
+      // find insert location through insertNode
+      insertNode(root, newNode);
+    }
+  };
+
+  this.search = function(key) {
+    return searchNode(root, key); 
+      function searchNode(node, key) {
+        if (node === null) {
+          return false;
+        }
+        if (key < node.key) {
+          return searchNode(node.left, key);
+        }
+        else if (key > node.key) {
+          return searchNode(node.right, key);
+        }
+        else {
+          return true;
+      }
+      }
+
+  };
+
+  this.inOrderTraverse = function(callback) {
+    inOrderTraverseNode(root, callback);  
+       function inOrderTraverseNode(node, callback) {
+        if (node != null) {
+          inOrderTraverseNode(node.left, callback);
+          callback(node.key);
+          inOrderTraverseNode(node.right, callback);
+        }
+       }
+      
+  };
+  
+
+  this.preOrderTraverse = function(callback) {
+    preOrderTraverseNode(root, callback); 
+      function preOrderTraverseNode(node, callback) {
+        if (node != null) {
+          callback(node.key);
+          preOrderTraverseNode(node.left, callback);
+          preOrderTraverseNode(node.right, callback);
+        }
+      }
+    
+  };
+
+  this.postOrderTraverse = function(callback) {
+    postOrderTraverseNode(root, callback); 
+      function postOrderTraverseNode(node, callback) {
+        if (node != null) {
+          postOrderTraverseNode(node.left, callback);
+          postOrderTraverseNode(node.right, callback);
+          callback(node.key);
+        }
+      }
+    
+  };
+
+  this.min = function() {
+    return minNode(root);
+  }
+  function minNode(node) {
+    var current = node;
+    while (current != null && current.left != null) {
+      current = current.left;
+    }
+    return current;
+  };
+
+  this.max = function() {
+    return maxNode(root);
+  }
+  function maxNode(node) {
+    var current = node;
+    while (current != null && current.right != null) {
+      current = current.right;
+    }
+    return current;
+  };
+
+  this.remove = function() {
+    this.root = removeNode(root, key); 
+      function removeNode(node, key) {
+        if (node == null) {
+          return null;
+        }
+        if (this.compareFn(key, node.key) === Compare.LESS_THAN) {
+          node.left = removeNode(node.left, key);
+          return node;
+        }
+        else if (this.compareFn(key, node.key) === Compare.BIGGER_THAN) {
+          node.right = removeNode(node.right, key);
+          return node;
+        }
+        else {
+          // key is equal to node.key
+          // case 1: a leaf node
+          if (node.left == null && node.right == null) {
+            node = null;
+            return node;
+          }
+          // case 2: a node with only one child
+          if (node.left == null) {
+            node = node.right;
+            return node;
+          }
+          else if (node.right == null) {
+            node = node.left;
+            return node;
+          }
+          // case 3: a node with two children
+          var aux = this.minNode(node.right);
+          node.key = aux.key;
+          node.right = removeNode(node.right, aux.key);
+          return node;
+        }
+      }
+    
+  };
+
+  this.print = function() {
+    function print(node) {
+      // check if not is not null
+      if (node !== null) {
+        // text for left child
+        var leftChild = node.left !== null ? node.left.key : "None";
+        // text for right child
+        var rightChild = node.right !== null ? node.right.key : "None";
+        // print output
+        console.log(leftChild + " <-- " + node.key + " --> " + rightChild);
+        // traverse left
+        print(node.left);
+        // traverse right
+        print(node.right);
+      }
+    }
+    console.log("===tree===");
+    print(root);
+    console.log("==========");
+  };
+}
+
+
+
+// 1. Complete the construction of the tree below based on the example from
+//    the book.
+
+var tree = new BinarySearchTree();
+tree.insert(11);
+tree.insert(7);
+tree.insert(15);
+tree.insert(7);
+tree.insert(5);
+tree.insert(3);
+tree.insert(9);
+tree.insert(8);
+tree.insert(10);
+tree.insert(13);
+tree.insert(12);
+tree.insert(14);
+tree.insert(20);
+tree.insert(18);
+tree.insert(25);
+tree.insert(6);
+
+tree.print();
+
+
+
+//----------------//
+// Tree traversal //
+//----------------//
+console.log("Tree traversal");
+
+function printNode(value) {
+  console.log(value);
+}
+
+// 1. Implement in-order traversal. Test your implementation with the
+//    printNode() function given above.
+//    NOTE: in-order means all keys are visited in sorted order.
+console.log("In-order traversal");
+tree.inOrderTraverse(printNode);
+// 2. Implement pre-order traversal. Test your implementation with the
+//    printNode() function given above.
+//    NOTE: pre-order means a node is visited prior to its descendants.
+console.log("Pre-order traversal");
+tree.preOrderTraverse(printNode);
+// 3. Implement post-order traversal. Test your implementation with the
+//    printNode() function given above.
+//    NOTE: pre-order means a node is visited after its descendants.
+console.log("Post-order traversal");
+tree.postOrderTraverse(printNode);
+
+
+//--------------------------------//
+// Searching for values in a tree //
+//--------------------------------//
+console.log("Searching for values in a tree");
+
+// 1. Implement the min method above and show that it works.
+console.log("Minimum value in the tree:");
+console.log(tree.min().key);
+// 2. Implement the max method above and show that it works.
+console.log("Maximum value in the tree:");
+console.log(tree.max().key);
+// 3. Implement the search method above and show that it works.
+console.log("Searching for values in the tree:");
+console.log("Search for 10: " + tree.search(10));
+console.log("Search for 4: " + tree.search(4));
+console.log("Search for 14: " + tree.search(14));
+console.log("Search for 21: " + tree.search(21));
+console.log("Search for 6: " + tree.search(6));
+console.log("Search for 100: " + tree.search(100));
+
+
+//--------------------------//
+// Creating the Graph class //
+//--------------------------//
+console.log("Creating the Graph class");
+
+// 1. Implement the Graph class.
+
+function Dictionary() {
+  // store all elements in the items object
+  var items = {};
+
+  this.toStrFn = function(key) {
+    if (key === null) {
+      return "NULL";
+    } else if (key === undefined) {
+      return "UNDEFINED";
+    } else if (typeof key === "string" || key instanceof String) {
+      return key;
+    }
+    return key.toString();
+  };
+
+  this.set = function(key, value) {
+    if (key != null && value != null) {
+      var tableKey = this.toStrFn(key);
+      items[tableKey] = { key: key, value: value };
+      return true;
+    }
+    return false;
+  };
+
+  this.delete = function(key) {
+    if (this.has(key)) {
+      delete items[this.toStrFn(key)];
+      return true;
+    }
+    return false;
+  };
+
+  this.has = function(key) {
+    return items[this.toStrFn(key)] != null;
+  };
+
+  this.get = function(key) {
+    
+    var valuePair = items[this.toStrFn(key)];
+    return valuePair == null ? undefined : valuePair.value;
+ 
+  };
+
+  this.clear = function() {
+    items = {};
+  };
+
+  this.size = function() {
+    return Object.keys(items).length;
+  };
+
+  this.keys = function() {
+    return Object.keys(items).map(key => items[key].key);
+  };
+
+  this.values = function() {
+    return Object.values(items).map(valuePair => valuePair.value);
+  };
+
+  this.getItems = function() {
+    return items;
+  };
+}
+
+class Graph {
+  constructor(isDirected = false) {
+    this.isDirected = isDirected;
+    this.vertices = [];
+    this.adjList = new Dictionary();
+ }
+
+ addVertex(v) {
+    if (!this.vertices.includes(v)) {
+      this.vertices.push(v);
+      this.adjList.set(v, []);
+    }
+  }
+
+addEdge(v, w) {
+  if (!this.adjList.has(v)) {
+    this.addVertex(v);
+  }
+  if (!this.adjList.get(w)) {
+    this.addVertex(w);
+  }
+  this.adjList.get(v).push(w);
+  if (!this.isDirected) {
+    this.adjList.get(w).push(v);
+ }
+}
+
+  getVertices() {
+    return this.vertices;
+  }
+  getadjList() {
+    return this.adjList;
+  }
+ 
+  toString() {
+  var s = '';
+  for (var i = 0; i < this.vertices.length; i++) {
+    s += this.vertices[i] + ' -> ';
+    var neighbors = this.adjList.get(this.vertices[i]);
+    for (var j = 0; j < neighbors.length; j++) {
+      s += neighbors[j] + ' ';
+    }
+    s += '\n';
+  }
+  return s;
+ }
+
+ }
+
+// 2. Test the Graph class with the example from the book.
+var graph = new Graph();
+
+var myVertices = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
+
+for (var i = 0; i < myVertices.length; i++) {
+  graph.addVertex(myVertices[i]);
+}
+graph.addEdge("A", "B");
+graph.addEdge("A", "C");
+graph.addEdge("A", "D");
+graph.addEdge("C", "D");
+graph.addEdge("C", "G");
+graph.addEdge("D", "G");
+graph.addEdge("D", "H");
+graph.addEdge("B", "E");
+graph.addEdge("B", "F");
+graph.addEdge("E", "I");
+
+console.log(graph.toString());
+//------------------//
+// Graph traversals //
+//------------------//
+console.log("Graph traversals");
+
+// 1. Implement breadth-first search in the Graph class above.
+
+console.log("Breadth-first search");
+function Queue() {
+  var items = [];
+
+  this.enqueue = function(element) {
+    items.push(element);
+  };
+  this.dequeue = function() {
+    return items.shift();
+  };
+    
+  this.front = function() {
+    return items[0];
+  };
+
+this.isEmpty = function(){
+    return items.length === 0;
+  };
+  this.size = function() {
+    return items.length;
+  }
+this.print = function() {
+  console.log(items);
+};
+}
+
+var Colors = {
+  WHITE: 0,
+  GREY: 1,
+  BLACK: 2
+}
+
+var initializeColor = vertices => {
+  var color = {};
+  for (var i = 0; i < vertices.length; i++) {
+    color[vertices[i]] = Colors.WHITE;
+  }
+  return color;
+}
+
+ var breadthFirstSearch = function(graph, startVertex, callback)  {
+  var vertices = graph.getVertices();
+  var adjList = graph.getadjList();
+  var color = initializeColor(vertices);
+  var queue = new Queue();
+
+  queue.enqueue(startVertex);
+
+  while (!queue.isEmpty()) {
+    var u = queue.dequeue();
+    var neighbors = adjList.get(u);
+    color[u] = Colors.GREY;
+    for (var i = 0; i < neighbors.length; i++) {
+      var w = neighbors[i];
+      if (color[w] === Colors.WHITE) {
+        color[w] = Colors.GREY;
+        queue.enqueue(w);
+      }
+    }
+    color[u] = Colors.BLACK;
+    if (callback) {
+      callback(u);
+    }
+  }
+};
+
+var printVertex = (value) => console.log('Visited vertex: ' + value);
+
+
+breadthFirstSearch(graph, myVertices[0], printVertex);
+
+// 2. Implement depth-first search in the Graph class above.
+
+console.log("Depth-first search");
+
+var depthFirstSearch = function(graph, callback) {
+  var vertices = graph.getVertices();
+  var adjList = graph.getadjList();
+  var color = initializeColor(vertices);
+
+  for (var i = 0; i < vertices.length; i++) {
+    if (color[vertices[i]] === Colors.WHITE) {
+      depthFirstSearchVisit(vertices[i], color, adjList, callback);
+    }
+  }
+};
+
+var depthFirstSearchVisit = function(u, color, adjList, callback) {
+  color[u] = Colors.GREY;
+  if (callback) {
+    callback(u);
+  }
+
+  var neighbors = adjList.get(u);
+  for (var i = 0; i < neighbors.length; i++) {
+    var w = neighbors[i];
+    if (color[w] === Colors.WHITE) {
+      depthFirstSearchVisit(w, color, adjList, callback);
+    }
+  }
+  color[u] = Colors.BLACK;
+};
+
+depthFirstSearch(graph, printVertex);
+
+//--------------------------//
+// Shortest path algorithms //
+//--------------------------//
+console.log("Shortest path algorithms");
+
+// 1. Implement Dijkstra's algorithm.
+//    NOTE: Replace INF (used in the book) with Infinity.
+
+console.log("Dijkstra's algorithm");
+
+var graph1 = [[0, 2, 4, 0, 0, 0],
+             [0, 0, 1, 4, 2, 0],
+             [0, 0, 0, 0, 3, 0],
+             [0, 0, 0, 0, 0, 2],
+             [0, 0, 0, 3, 0, 2],
+             [0, 0, 0, 0, 0, 0]];
+
+var infinity = Number.MAX_SAFE_INTEGER;
+
+var dijkstra = (graph1, src) => {
+  var dist = [];
+  var visited = [];
+  var { length } = graph1;
+    for (var i = 0; i < length; i++) {
+      dist[i] = Infinity;
+      visited[i] = false;
+    }
+    dist[src] = 0;
+    for (var i = 0; i < length - 1; i++) {
+      var u = minDistance(dist, visited);
+      visited[u] = true;
+      for (var v = 0; v < length; v++) {
+        if (!visited[v] &&
+            graph1[u][v] !== 0 &&
+            dist[u] !== Infinity &&
+            dist[u] + graph1[u][v] < dist[v]) {
+          dist[v] = dist[u] + graph1[u][v];
+        }
+    }
+}
+return dist;
+};
+var minDistance = (dist, visited) => {
+  var min = Infinity;
+  var minIndex = -1;
+  for (var v = 0; v < dist.length; v++) {
+    if (visited[v] === false && dist[v] <= min) {
+      min = dist[v];
+      minIndex = v;
+    }
+  }
+  return minIndex;
+};
+// 2. Test your implementation of Dijkstra's algorithm.
+
+console.log(dijkstra(graph1,0));
+
+</script>
+</head>
+<body>
+  See console!
+</body>
+</html>
