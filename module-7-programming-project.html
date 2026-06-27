@@ -1,0 +1,209 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>CMPS 260: Module 7 Programming Project</title>
+<style>* { font-family: monospace; }</style>
+<script>
+
+// NOTE: You must implement the data structures using the prototype approach.
+//       This is not what the book uses, so you have to convert it.
+//       See also: https://it.pointpark.edu/tutorials/no-prototype-vs-prototype/
+
+// NOTE: Please review the following links regularly:
+//       https://it.pointpark.edu/tutorials/arrays-vs-objects/
+//       https://it.pointpark.edu/tutorials/no-prototype-vs-prototype/
+//       https://it.pointpark.edu/tutorials/implementation-vs-interface/
+
+
+
+//---------//
+// Project //
+//---------//
+console.log("Project");
+
+// 1. Implement factorial using a recursive function and test your code.
+function factorial(n) {
+  if (n === 1 || n === 0) {
+    return 1;
+  }
+  return n * factorial(n - 1);
+}
+console.log(factorial(5));
+// 2. Implement a function that returns the complete fibonacci sequence in an
+//    array for a given number.
+function fibonacciSequence(n) {
+  if (n === 0) return [0];
+
+  var sequence = [0, 1];
+  for (var i = 2; i <= n; i++) {
+    sequence.push(sequence[i - 1] + sequence[i - 2])
+  }
+  return sequence;
+};
+
+console.log(fibonacciSequence(5));
+
+// 3. Implement finding the longest common subsequence using dynamic
+//    programming. Test your code.
+console.log("LCS DP")
+/*
+function printSolution(solution, wordX, m, n) {
+  var a = m;
+  var b = n;
+  var x = solution[a][b];
+  var answer = '';
+  while (x !== '0') {
+    if(solution[a][b] === 'diagonal') {
+      answer = wordX[a-1] + answer;
+      a--;
+      b--;
+    } else if (solution[a][b] === 'left') {
+      b--;
+    } else if (solution[a][b] === 'top') {
+      a--;
+    }
+    x = solution[a][b];
+  }
+  console.log('lcs: ' + answer);
+}
+
+
+function lcs(wordX, wordY) {
+  var m = wordX.length;
+  var n = wordY.length;
+  var l = [];
+  
+
+  for (var i = 0; i <= m; i++) {
+   solution[i] = [];
+    for (var j = 0; j <= n; j++) {
+      solution[i][j] = '0';
+    }
+  }
+
+  for (var i = 0; i <= m; i++) {
+    for (var j = 0; j <= n; j++) {
+      if (i === 0 || j === 0) {
+        l[i][j] = 0;
+      } else if (wordX[i - 1] === wordY[j - 1]) {
+        solution[i][j] = 'diagonal';
+      } else {
+        var a = l[i - 1][j];
+        var b = l[i][j - 1];
+        solution[i][j] = (l[i][j] == l[i-1][j]) ? 'top' : 'left'
+      }
+    }
+  }
+  printSolution(solution, wordX, m, n);
+}
+*/
+
+function lcs(wordX, wordY) {
+  var m = wordX.length;
+  var n = wordY.length;
+  
+
+  var lengths = [];
+
+  var directions = [];
+  
+
+  for (var i = 0; i <= m; i++) {
+    lengths[i] = [];
+    directions[i] = [];
+    for (var j = 0; j <= n; j++) {
+      lengths[i][j] = 0;
+      directions[i][j] = '0';
+    }
+  }
+  
+
+  for (var i = 1; i <= m; i++) {
+    for (var j = 1; j <= n; j++) {
+      if (wordX[i - 1] === wordY[j - 1]) {
+        lengths[i][j] = lengths[i - 1][j - 1] + 1;
+        directions[i][j] = 'diagonal';
+      } else {
+        var top = lengths[i - 1][j];
+        var left = lengths[i][j - 1];
+        if (top >= left) {
+          lengths[i][j] = top;
+          directions[i][j] = 'top';
+        } else {
+          lengths[i][j] = left;
+          directions[i][j] = 'left';
+        }
+      }
+    }
+  }
+  
+  printSolution(directions, wordX, m, n);
+}
+
+function printSolution(directions, wordX, m, n) {
+  var a = m;
+  var b = n;
+  var x = directions[a][b];
+  var answer = '';
+  
+  while (x !== '0') {
+    if (directions[a][b] === 'diagonal') {
+      answer = wordX[a - 1] + answer;
+      a--;
+      b--;
+    } else if (directions[a][b] === 'left') {
+      b--;
+    } else if (directions[a][b] === 'top') {
+      a--;
+    }
+    x = directions[a][b];
+  }
+  
+  console.log('lcs: ' + answer);
+}
+
+
+console.log(lcs('acbaed', 'abcadf'));
+
+// 4. Solve the problem of summing all the numbers in an array using
+//    imperative style.
+console.log("Sum Array Imperative")
+function sumArray(array) {
+  var total = 0;
+  for (var num of array) {
+    total += num;
+  }
+  return total;
+}
+console.log(sumArray([10, 10, 10]))
+// 5. Solve the problem of summing all the numbers in an array using
+//    functional style.
+console.log("Sum Array Functional")
+var add = (a, b) => a + b;
+var sumArr = (arr) => arr.reduce(add);
+
+console.log(sumArr([10, 10, 10]))
+// 6. Solve problem 14 of Project Euler: https://projecteuler.net/problem=14
+//    Note: This may be a bit challenging. Try to get as far as you can.
+//          Instead of one million you could use a smaller number for testing.
+console.log("Kollatz Function")
+function collatz(n) {
+  console.log(n)
+  if (n === 1) return;
+  if (n % 2 === 0) {
+    collatz(n / 2)
+  } else {
+    collatz(3 * n + 1)
+  }
+}
+console.log("Kollatz Function Test 1");
+console.log(collatz(1));
+console.log("Kollatz Function Test 2");
+console.log(collatz(1000));
+</script>
+</head>
+<body>
+  See console!
+</body>
+</html>
